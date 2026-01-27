@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>⚠️ Phishing Warning</title>
+  <style>
+    body { font-family: Arial, sans-serif; text-align: center; padding: 50px; background: #f8d7da; }
+    .container { max-width: 600px; margin: 0 auto; background: white; padding: 40px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+    .icon { font-size: 80px; margin-bottom: 20px; }
+    h1 { color: #721c24; }
+    .url { background: #f5f5f5; padding: 10px; border-radius: 5px; word-break: break-all; margin: 20px 0; }
+    .btn { padding: 12px 24px; margin: 10px; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; }
+    .btn-danger { background: #dc3545; color: white; }
+    .btn-secondary { background: #6c757d; color: white; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="icon">🛡️</div>
+    <h1>Phishing Attempt Blocked</h1>
+    <p>This website has been identified as a phishing attempt and has been blocked for your safety.</p>
+    
+    <div class="url" id="blockedUrl"></div>
+    
+    <p><strong>Risk Score:</strong> <span id="riskScore"></span></p>
+    
+    <p>Phishing sites steal personal information like passwords, credit cards, and identity details.</p>
+    
+    <button class="btn btn-secondary" onclick="history.back()">← Go Back</button>
+    <button class="btn btn-danger" onclick="proceedAnyway()">Proceed Anyway (Not Recommended)</button>
+  </div>
+  
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    document.getElementById('blockedUrl').textContent = params.get('url');
+    document.getElementById('riskScore').textContent = (parseFloat(params.get('score')) * 100).toFixed(0) + '%';
+    
+    function proceedAnyway() {
+      if (confirm('Are you sure? This site is dangerous!')) {
+        window.location.href = params.get('url');
+      }
+    }
+  </script>
+</body>
+</html>
