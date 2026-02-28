@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sms-service
+  namespace: phishing-shield
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: sms-service
+  template:
+    metadata:
+      labels:
+        app: sms-service
+    spec:
+      containers:
+      - name: sms-service
+        image: phishing-shield/sms-service:2.0.0
+        ports:
+        - containerPort: 8000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sms-service
+  namespace: phishing-shield
+spec:
+  selector:
+    app: sms-service
+  ports:
+  - port: 8000
+    targetPort: 8000

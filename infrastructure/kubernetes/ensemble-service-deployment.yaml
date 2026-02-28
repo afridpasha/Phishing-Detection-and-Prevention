@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ensemble-service
+  namespace: phishing-shield
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ensemble-service
+  template:
+    metadata:
+      labels:
+        app: ensemble-service
+    spec:
+      containers:
+      - name: ensemble-service
+        image: phishing-shield/ensemble-service:2.0.0
+        ports:
+        - containerPort: 8000
