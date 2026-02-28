@@ -21,14 +21,18 @@ print("URL PHISHING DETECTION MODEL TRAINER")
 print("="*80)
 print(f"Started: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
 
+# Reproducibility
+np.random.seed(42)
+
 # Load dataset
+DATASET_PATH = 'datasets/URL_PHISHING_DATASET.csv'
 print("[*] Loading dataset...")
-df = pd.read_csv('datasets/URL_PHISHING_DATASET_PERFECT.csv', low_memory=False)
-print(f"[+] Loaded {len(df):,} URLs")
+df = pd.read_csv(DATASET_PATH, low_memory=False)
+print(f"[+] Loaded {len(df):,} URLs from {DATASET_PATH}")
 print(f"   - Phishing: {(df['label']=='phishing').sum():,}")
 print(f"   - Legitimate: {(df['label']=='legitimate').sum():,}\n")
 
-# Select numeric features
+# Select numeric URL-derived features (must align with URLAnalyzer)
 print("[*] Preparing features...")
 feature_cols = [
     'url_length', 'domain_length', 'path_length', 'has_https', 'has_http',
@@ -45,6 +49,10 @@ feature_cols = [
     'tld_length', 'tld_suspicious', 'url_entropy', 'special_char_ratio'
 ]
 
+missing_cols = [c for c in feature_cols if c not in df.columns]
+if missing_cols:
+    raise ValueError(f"Missing expected feature columns: {missing_cols}")
+
 X = df[feature_cols].fillna(0)
 y = (df['label'] == 'phishing').astype(int)
 
@@ -53,25 +61,50 @@ print(f"[+] Samples: {X.shape[0]:,}\n")
 
 # Split data
 print("[*] Splitting dataset (80/20)...")
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42, stratify=y
+)
 print(f"   - Training: {len(X_train):,}")
 print(f"   - Testing: {len(X_test):,}\n")
+
+# Training configuration
+N_ESTIMATORS = 200
 
 # Train models
 print("[*] Training models...\n")
 
+def build_models(
+    n_estimators_xgb: int = N_ESTIMATORS,
+    n_estimators_lgb: int = N_ESTIMATORS
+):
+    xgb_model = xgb.XGBClassifier(
+        n_estimators=n_estimators_xgb,
+        max_depth=8,
+        learning_rate=0.08,
+        subsample=0.9,
+        colsample_bytree=0.9,
+        random_state=42,
+        n_jobs=-1,
+        eval_metric='logloss',
+        tree_method='hist'
+    )
+
+    lgb_model = lgb.LGBMClassifier(
+        n_estimators=n_estimators_lgb,
+        max_depth=8,
+        learning_rate=0.08,
+        subsample=0.9,
+        colsample_bytree=0.9,
+        random_state=42,
+        n_jobs=-1,
+        verbose=-1
+    )
+
+    return xgb_model, lgb_model
+
 # 1. XGBoost
 print("[1] Training XGBoost...")
-xgb_model = xgb.XGBClassifier(
-    n_estimators=300,
-    max_depth=8,
-    learning_rate=0.1,
-    subsample=0.8,
-    colsample_bytree=0.8,
-    random_state=42,
-    n_jobs=-1,
-    eval_metric='logloss'
-)
+xgb_model, lgb_model = build_models()
 xgb_model.fit(X_train, y_train)
 xgb_pred = xgb_model.predict(X_test)
 xgb_acc = accuracy_score(y_test, xgb_pred)
@@ -79,58 +112,18 @@ print(f"    [+] Accuracy: {xgb_acc:.4f}")
 
 # 2. LightGBM
 print("[2] Training LightGBM...")
-lgb_model = lgb.LGBMClassifier(
-    n_estimators=300,
-    max_depth=8,
-    learning_rate=0.1,
-    subsample=0.8,
-    colsample_bytree=0.8,
-    random_state=42,
-    n_jobs=-1,
-    verbose=-1
-)
 lgb_model.fit(X_train, y_train)
 lgb_pred = lgb_model.predict(X_test)
 lgb_acc = accuracy_score(y_test, lgb_pred)
 print(f"    [+] Accuracy: {lgb_acc:.4f}")
-
-# 3. Random Forest
-print("[3] Training Random Forest...")
-rf_model = RandomForestClassifier(
-    n_estimators=200,
-    max_depth=15,
-    min_samples_split=5,
-    min_samples_leaf=2,
-    random_state=42,
-    n_jobs=-1
-)
-rf_model.fit(X_train, y_train)
-rf_pred = rf_model.predict(X_test)
-rf_acc = accuracy_score(y_test, rf_pred)
-print(f"    [+] Accuracy: {rf_acc:.4f}")
-
-# 4. Gradient Boosting
-print("[4] Training Gradient Boosting...")
-gb_model = GradientBoostingClassifier(
-    n_estimators=200,
-    max_depth=7,
-    learning_rate=0.1,
-    subsample=0.8,
-    random_state=42
-)
-gb_model.fit(X_train, y_train)
-gb_pred = gb_model.predict(X_test)
-gb_acc = accuracy_score(y_test, gb_pred)
-print(f"    [+] Accuracy: {gb_acc:.4f}\n")
+print()
 
 # Ensemble
 print("[*] Creating Ensemble Model...")
 ensemble = VotingClassifier(
     estimators=[
         ('xgb', xgb_model),
-        ('lgb', lgb_model),
-        ('rf', rf_model),
-        ('gb', gb_model)
+        ('lgb', lgb_model)
     ],
     voting='soft',
     n_jobs=-1
@@ -169,16 +162,38 @@ print(f"   - True Positives:  {tp:,}")
 print(f"\n[*] Classification Report:")
 print(classification_report(y_test, ensemble_pred, target_names=['Legitimate', 'Phishing']))
 
+# Retrain on full dataset for final model
+print("\n[*] Retraining on full dataset for final model...")
+best_xgb = N_ESTIMATORS
+best_lgb = N_ESTIMATORS
+
+xgb_full, lgb_full = build_models(
+    n_estimators_xgb=best_xgb,
+    n_estimators_lgb=best_lgb
+)
+xgb_full.fit(X, y)
+lgb_full.fit(X, y)
+
+ensemble_full = VotingClassifier(
+    estimators=[
+        ('xgb', xgb_full),
+        ('lgb', lgb_full)
+    ],
+    voting='soft',
+    n_jobs=-1
+)
+ensemble_full.fit(X, y)
+
 # Save models
 print("\n[*] Saving models...")
-joblib.dump(ensemble, 'models/url_phishing_ensemble.joblib', compress=3)
-joblib.dump(xgb_model, 'models/url_phishing_xgboost.joblib', compress=3)
+joblib.dump(ensemble_full, 'models/url_phishing_ensemble.joblib', compress=3)
+joblib.dump(xgb_full, 'models/url_phishing_xgboost.joblib', compress=3)
 joblib.dump(feature_cols, 'models/url_feature_columns.joblib', compress=3)
 
-# Also save a simple predictor function
+# Also save a simple predictor bundle
 import pickle
 predictor_data = {
-    'model': ensemble,
+    'model': ensemble_full,
     'features': feature_cols,
     'scaler': None
 }

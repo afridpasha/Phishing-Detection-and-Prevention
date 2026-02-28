@@ -74,10 +74,12 @@ class URLAnalyzer:
         try:
             model_path = 'models/url_phishing_ensemble.joblib'
             features_path = 'models/url_feature_columns.joblib'
+            scaler_path = 'models/url_feature_scaler.joblib'
             
             if os.path.exists(model_path) and os.path.exists(features_path):
                 self.ml_model = joblib.load(model_path)
                 self.feature_cols = joblib.load(features_path)
+                self.scaler = joblib.load(scaler_path) if os.path.exists(scaler_path) else None
                 logger.info("ML model loaded successfully")
             else:
                 logger.warning("ML model not found, using pattern-based detection only")
@@ -236,6 +238,9 @@ class URLAnalyzer:
         if self.ml_model is not None and self.feature_cols is not None:
             try:
                 features = self._extract_ml_features(url, parsed)
+                # Apply scaler if available
+                if self.scaler is not None:
+                    features = self.scaler.transform(features)
                 ml_proba = self.ml_model.predict_proba(features)[0][1]  # Probability of phishing
                 results['ml_score'] = float(ml_proba)
                 results['ml_prediction'] = 'phishing' if ml_proba > 0.5 else 'legitimate'

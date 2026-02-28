@@ -26,20 +26,10 @@
     
     <p>Phishing sites steal personal information like passwords, credit cards, and identity details.</p>
     
-    <button class="btn btn-secondary" onclick="history.back()">← Go Back</button>
-    <button class="btn btn-danger" onclick="proceedAnyway()">Proceed Anyway (Not Recommended)</button>
+    <button class="btn btn-secondary" id="goBackBtn">← Go Back</button>
+    <button class="btn btn-danger" id="proceedBtn">Proceed Anyway (Not Recommended)</button>
   </div>
   
-  <script>
-    const params = new URLSearchParams(window.location.search);
-    document.getElementById('blockedUrl').textContent = params.get('url');
-    document.getElementById('riskScore').textContent = (parseFloat(params.get('score')) * 100).toFixed(0) + '%';
-    
-    function proceedAnyway() {
-      if (confirm('Are you sure? This site is dangerous!')) {
-        window.location.href = params.get('url');
-      }
-    }
-  </script>
+  <script src="warning.js"></script>
 </body>
 </html>
