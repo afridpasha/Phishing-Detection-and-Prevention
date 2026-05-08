@@ -1,0 +1,31 @@
+# ── Core ML ───────────────────────────────────────────────────────────────────
+torch>=2.0.0
+transformers>=4.38.0
+onnxruntime>=1.16.0
+numpy>=1.24.0
+scipy>=1.10.0
+sentencepiece>=0.1.99
+
+# ── Web framework ─────────────────────────────────────────────────────────────
+flask>=3.0.0
+flask-cors>=4.0.0
+werkzeug>=3.0.0
+
+# ── HTML parsing ──────────────────────────────────────────────────────────────
+beautifulsoup4>=4.12.0
+lxml>=5.2.0
+
+# ── Image processing (Category 4) ─────────────────────────────────────────────
+ultralytics>=8.2.0
+Pillow>=10.0.0
+opencv-python>=4.9.0
+pyzxing>=0.1.4
+
+# ── Performance & caching (new) ───────────────────────────────────────────────
+cachetools==5.3.3
+
+# ── Domain-age detection (new) ────────────────────────────────────────────────
+python-whois==0.9.4
+
+# ── HTTP requests (URL expansion) ─────────────────────────────────────────────
+requests==2.32.3

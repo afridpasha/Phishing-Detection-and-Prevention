@@ -1,0 +1,1026 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phishing Shield 2.0 - Complete Protection</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 40px;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #eee;
+        }
+        
+        .tab {
+            padding: 15px 30px;
+            background: none;
+            border: none;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            color: #666;
+            transition: all 0.3s;
+        }
+        
+        .tab:hover {
+            color: #667eea;
+        }
+        
+        .tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        input, textarea {
+            flex: 1;
+            padding: 15px 20px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 16px;
+            font-family: inherit;
+            transition: border-color 0.3s;
+        }
+        
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+        
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .analyze-btn {
+            padding: 15px 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .analyze-btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .analyze-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .loading {
+            text-align: center;
+            display: none;
+            margin: 20px 0;
+        }
+        
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .result {
+            display: none;
+            margin-top: 30px;
+        }
+        
+        .verdict {
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .verdict.safe {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+        }
+        
+        .verdict.danger {
+            background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%);
+            color: white;
+        }
+        
+        .verdict-icon {
+            font-size: 4em;
+            margin-bottom: 10px;
+        }
+        
+        .verdict-text {
+            font-size: 2em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .verdict-score {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .stat-label {
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        /* Change #24: Color-coded model vote cards */
+        .models-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .model-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+            transition: transform 0.15s ease;
+        }
+        .model-card:hover { transform: translateY(-2px); }
+        
+        .model-card.vote-phishing {
+            background: #fff5f5;
+            border-left-color: #e53e3e;
+        }
+        .model-card.vote-safe {
+            background: #f0fff4;
+            border-left-color: #38a169;
+        }
+        
+        .model-name {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 8px;
+            font-size: 0.9em;
+        }
+        .model-prediction {
+            font-size: 1em;
+            font-weight: 600;
+        }
+        .model-prediction.phishing { color: #c53030; }
+        .model-prediction.safe     { color: #276749; }
+        
+        .model-confidence {
+            margin-top: 5px;
+            font-size: 0.85em;
+            color: #666;
+        }
+        .model-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-size: 0.75em;
+            font-weight: bold;
+            margin-top: 6px;
+        }
+        .badge-phishing { background: #fed7d7; color: #c53030; }
+        .badge-safe     { background: #c6f6d5; color: #276749; }
+
+        /* Change #25: Latency display */
+        .latency-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 12px;
+            background: #ebf4ff;
+            color: #2b6cb0;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+            margin-top: 12px;
+        }
+
+        /* Change #26: Copy button */
+        .copy-btn {
+            margin-top: 15px;
+            padding: 8px 20px;
+            background: #edf2f7;
+            border: 1px solid #cbd5e0;
+            border-radius: 8px;
+            font-size: 0.9em;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .copy-btn:hover { background: #e2e8f0; }
+        .copy-btn.copied { background: #c6f6d5; border-color: #68d391; color: #276749; }
+
+        .risk-indicators {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+        .risk-indicators h4 { color: #856404; margin-bottom: 10px; }
+        .risk-item { padding: 5px 0; color: #856404; }
+        
+        .error {
+            background: #fee;
+            color: #c33;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Phishing Shield 2.0</h1>
+        <p class="subtitle">Complete Phishing Protection - URL, SMS, Email & Image Detection</p>
+        
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('url')">URL Detection</button>
+            <button class="tab" onclick="switchTab('sms')">SMS Detection</button>
+            <button class="tab" onclick="switchTab('email')">Email Detection</button>
+            <button class="tab" onclick="switchTab('image')">Image Detection</button>
+        </div>
+        
+        <!-- URL Detection Tab -->
+        <div id="url-tab" class="tab-content active">
+            <div class="input-group">
+                <input type="text" id="urlInput" placeholder="Enter URL to analyze (e.g., https://example.com)" />
+                <button class="analyze-btn" onclick="analyzeURL()">Analyze URL</button>
+            </div>
+            
+            <div class="loading" id="urlLoading">
+                <div class="spinner"></div>
+                <p style="margin-top: 10px; color: #666;">Analyzing with 4 AI models...</p>
+            </div>
+            
+            <div class="error" id="urlError"></div>
+            
+            <div class="result" id="urlResult">
+                <div class="verdict" id="urlVerdict">
+                    <div class="verdict-icon" id="urlVerdictIcon"></div>
+                    <div class="verdict-text" id="urlVerdictText"></div>
+                    <div class="verdict-score" id="urlVerdictScore"></div>
+                </div>
+                
+                <div class="stats">
+                    <div class="stat-item">
+                        <div class="stat-value" id="urlScoreValue">-</div>
+                        <div class="stat-label">Phishing Score</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="urlVotesValue">-</div>
+                        <div class="stat-label">Model Votes</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="urlConfidenceValue">-</div>
+                        <div class="stat-label">Confidence</div>
+                    </div>
+                </div>
+                <!-- Change #25: Latency -->
+                <div id="urlLatency" class="latency-badge" style="display:none;">⚡ <span id="urlLatencyVal"></span></div>
+                <!-- Change #26: Copy button -->
+                <button class="copy-btn" id="urlCopyBtn" onclick="copyResult('url')" style="display:none;">📋 Copy Result</button>
+                <h3 style="margin-top: 20px; color: #333;">Individual Model Results</h3>
+                <div class="models-grid" id="urlModelsGrid"></div>
+            </div>
+        </div>
+        
+        <!-- SMS Detection Tab -->
+        <div id="sms-tab" class="tab-content">
+            <div class="input-group">
+                <textarea id="smsInput" placeholder="Enter SMS message to analyze (e.g., URGENT: Your account has been suspended...)"></textarea>
+            </div>
+            <button class="analyze-btn" onclick="analyzeSMS()" style="width: 100%;">Analyze SMS</button>
+            
+            <div class="loading" id="smsLoading">
+                <div class="spinner"></div>
+                <p style="margin-top: 10px; color: #666;">Analyzing with 3 AI models...</p>
+            </div>
+            
+            <div class="error" id="smsError"></div>
+            
+            <div class="result" id="smsResult">
+                <div class="verdict" id="smsVerdict">
+                    <div class="verdict-icon" id="smsVerdictIcon"></div>
+                    <div class="verdict-text" id="smsVerdictText"></div>
+                    <div class="verdict-score" id="smsVerdictScore"></div>
+                </div>
+                
+                <div class="stats">
+                    <div class="stat-item">
+                        <div class="stat-value" id="smsScoreValue">-</div>
+                        <div class="stat-label">Smishing Score</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="smsVotesValue">-</div>
+                        <div class="stat-label">Model Votes</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="smsConfidenceValue">-</div>
+                        <div class="stat-label">Confidence</div>
+                    </div>
+                </div>
+                <div id="smsLatency" class="latency-badge" style="display:none;">⚡ <span id="smsLatencyVal"></span></div>
+                <button class="copy-btn" id="smsCopyBtn" onclick="copyResult('sms')" style="display:none;">📋 Copy Result</button>
+                
+                <div class="risk-indicators" id="smsRiskIndicators" style="display: none;">
+                    <h4>Risk Indicators Detected:</h4>
+                    <div id="smsRiskList"></div>
+                </div>
+                
+                <div class="risk-indicators" id="smsUrlAnalysis" style="display: none; background: #fff3cd; border: 1px solid #ffc107;">
+                    <h4>URLs Found in SMS:</h4>
+                    <div id="smsUrlList"></div>
+                </div>
+                
+                <h3 style="margin-top: 30px; color: #333;">Individual Model Results</h3>
+                <div class="models-grid" id="smsModelsGrid"></div>
+            </div>
+        </div>
+        
+        <!-- Email Detection Tab -->
+        <div id="email-tab" class="tab-content">
+            <div class="input-group">
+                <textarea id="emailInput" placeholder="Enter email content to analyze (include Subject, From, and Body)...
+
+Example:
+Subject: Urgent: Your PayPal Account
+From: security@paypal-verify.com
+
+Dear Customer,
+Your account has been suspended..."></textarea>
+            </div>
+            <button class="analyze-btn" onclick="analyzeEmail()" style="width: 100%;">Analyze Email</button>
+            
+            <div class="loading" id="emailLoading">
+                <div class="spinner"></div>
+                <p style="margin-top: 10px; color: #666;">Analyzing with 4 AI models + URL analysis...</p>
+            </div>
+            
+            <div class="error" id="emailError"></div>
+            
+            <div class="result" id="emailResult">
+                <div class="verdict" id="emailVerdict">
+                    <div class="verdict-icon" id="emailVerdictIcon"></div>
+                    <div class="verdict-text" id="emailVerdictText"></div>
+                    <div class="verdict-score" id="emailVerdictScore"></div>
+                </div>
+                
+                <div class="stats">
+                    <div class="stat-item">
+                        <div class="stat-value" id="emailScoreValue">-</div>
+                        <div class="stat-label">Phishing Score</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="emailVotesValue">-</div>
+                        <div class="stat-label">Model Votes</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="emailConfidenceValue">-</div>
+                        <div class="stat-label">Confidence</div>
+                    </div>
+                </div>
+                <div id="emailLatency" class="latency-badge" style="display:none;">⚡ <span id="emailLatencyVal"></span></div>
+                <button class="copy-btn" id="emailCopyBtn" onclick="copyResult('email')" style="display:none;">📋 Copy Result</button>
+                
+                <div class="risk-indicators" id="emailInfo" style="background: #e7f3ff; border: 1px solid #2196F3;">
+                    <h4 style="color: #1976D2;">Email Information:</h4>
+                    <div id="emailInfoContent"></div>
+                </div>
+                
+                <div class="risk-indicators" id="emailUrlAnalysis" style="display: none; background: #fff3cd; border: 1px solid #ffc107;">
+                    <h4>URLs Found in Email:</h4>
+                    <div id="emailUrlList"></div>
+                </div>
+                
+                <h3 style="margin-top: 30px; color: #333;">Individual Model Results</h3>
+                <div class="models-grid" id="emailModelsGrid"></div>
+            </div>
+        </div>
+        
+        <!-- Image Detection Tab -->
+        <div id="image-tab" class="tab-content">
+            <div style="margin-bottom: 20px;">
+                <label for="imageInput" style="display: block; margin-bottom: 10px; font-weight: 600; color: #333;">
+                    Upload Image (PNG, JPG, JPEG, GIF, BMP, WEBP - Max 16MB)
+                </label>
+                <input type="file" id="imageInput" accept="image/*" style="padding: 10px; width: 100%;" />
+            </div>
+            <button class="analyze-btn" onclick="analyzeImage()" style="width: 100%;">Analyze Image</button>
+            
+            <div class="loading" id="imageLoading">
+                <div class="spinner"></div>
+                <p style="margin-top: 10px; color: #666;">Analyzing with 3 AI models (QR, Brand, Text)...</p>
+            </div>
+            
+            <div class="error" id="imageError"></div>
+            
+            <div class="result" id="imageResult">
+                <div class="verdict" id="imageVerdict">
+                    <div class="verdict-icon" id="imageVerdictIcon"></div>
+                    <div class="verdict-text" id="imageVerdictText"></div>
+                    <div class="verdict-score" id="imageVerdictScore"></div>
+                </div>
+                
+                <div class="stats">
+                    <div class="stat-item">
+                        <div class="stat-value" id="imageScoreValue">-</div>
+                        <div class="stat-label">Phishing Score</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="imageConfidenceValue">-</div>
+                        <div class="stat-label">Confidence</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="imageRiskCount">-</div>
+                        <div class="stat-label">Risk Factors</div>
+                    </div>
+                </div>
+                <div id="imageLatency" class="latency-badge" style="display:none;">⚡ <span id="imageLatencyVal"></span></div>
+                <button class="copy-btn" id="imageCopyBtn" onclick="copyResult('image')" style="display:none;">📋 Copy Result</button>
+                
+                <div class="risk-indicators" id="imageRiskFactors" style="display: none;">
+                    <h4>Risk Factors Detected:</h4>
+                    <div id="imageRiskList"></div>
+                </div>
+                
+                <div class="risk-indicators" id="imageQRInfo" style="display: none; background: #fff3cd; border: 1px solid #ffc107;">
+                    <h4>QR Code Detection:</h4>
+                    <div id="imageQRContent"></div>
+                </div>
+                
+                <div class="risk-indicators" id="imageBrandInfo" style="display: none; background: #e7f3ff; border: 1px solid #2196F3;">
+                    <h4 style="color: #1976D2;">Brand Matching Results:</h4>
+                    <div id="imageBrandContent"></div>
+                </div>
+                
+                <div class="risk-indicators" id="imageTextInfo" style="display: none; background: #f3e5f5; border: 1px solid #9c27b0;">
+                    <h4 style="color: #7b1fa2;">Text Extraction:</h4>
+                    <div id="imageTextContent"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function switchTab(tab) {
+            // Update tab buttons
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Update tab content
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.getElementById(tab + '-tab').classList.add('active');
+        }
+        
+        // URL Detection
+        document.getElementById('urlInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') analyzeURL();
+        });
+        
+        async function analyzeURL() {
+            const url = document.getElementById('urlInput').value.trim();
+            
+            if (!url) {
+                showError('urlError', 'Please enter a URL');
+                return;
+            }
+            
+            resetUI('url');
+            document.getElementById('urlLoading').style.display = 'block';
+            
+            try {
+                const response = await fetch('/analyze', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ url: url })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    displayURLResult(data);
+                } else {
+                    showError('urlError', data.error || 'Analysis failed');
+                }
+            } catch (error) {
+                showError('urlError', 'Network error: ' + error.message);
+            } finally {
+                document.getElementById('urlLoading').style.display = 'none';
+            }
+        }
+        
+        // Shared result storage for copy-to-clipboard (Change #26)
+        const _lastResults = {};
+
+        // Change #24,25,26: Updated displayURLResult
+        function displayURLResult(data) {
+            _lastResults['url'] = data;
+            const isPhishing = data.is_phishing;
+
+            document.getElementById('urlVerdict').className = 'verdict ' + (isPhishing ? 'danger' : 'safe');
+            document.getElementById('urlVerdictIcon').textContent = isPhishing ? '⚠️' : '✅';
+            document.getElementById('urlVerdictText').textContent = isPhishing ? 'PHISHING DETECTED' : 'SAFE URL';
+            document.getElementById('urlVerdictScore').textContent = isPhishing ?
+                'This URL appears to be malicious' : 'This URL appears to be legitimate';
+
+            document.getElementById('urlScoreValue').textContent = (data.phishing_score * 100).toFixed(1) + '%';
+            document.getElementById('urlVotesValue').textContent = data.votes;
+            document.getElementById('urlConfidenceValue').textContent = (data.confidence * 100).toFixed(1) + '%';
+
+            // Change #25: Latency
+            if (data.latency_ms) {
+                document.getElementById('urlLatencyVal').textContent = `Analyzed in ${data.latency_ms}ms`;
+                document.getElementById('urlLatency').style.display = 'inline-flex';
+            }
+            document.getElementById('urlCopyBtn').style.display = 'inline-block';
+
+            const grid = document.getElementById('urlModelsGrid');
+            grid.innerHTML = '';
+
+            for (const [key, model] of Object.entries(data.individual_results)) {
+                // Change #24: Color-coded cards based on is_phishing flag
+                const isModelPhishing = model.is_phishing;
+                const card = document.createElement('div');
+                card.className = 'model-card ' + (isModelPhishing ? 'vote-phishing' : 'vote-safe');
+                let extra = '';
+                if (key === 'features') {
+                    if (model.typosquatting_score > 0.5) extra += `<div class="model-confidence">🎯 Typosquat: ${(model.typosquatting_score*100).toFixed(0)}%</div>`;
+                    if (model.is_new_domain) extra += `<div class="model-confidence">🆕 New domain (${model.domain_age_days}d old)</div>`;
+                }
+                card.innerHTML = `
+                    <div class="model-name">${model.model}</div>
+                    <div class="model-prediction ${isModelPhishing ? 'phishing' : 'safe'}">${model.prediction}</div>
+                    <div class="model-confidence">Confidence: ${(model.confidence * 100).toFixed(1)}%</div>
+                    ${extra}
+                    <span class="model-badge ${isModelPhishing ? 'badge-phishing' : 'badge-safe'}">
+                        ${isModelPhishing ? '🚨 Phishing' : '✅ Safe'}
+                    </span>
+                `;
+                grid.appendChild(card);
+            }
+
+            document.getElementById('urlResult').style.display = 'block';
+        }
+        
+        // SMS Detection
+        document.getElementById('smsInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && e.ctrlKey) analyzeSMS();
+        });
+        
+        async function analyzeSMS() {
+            const text = document.getElementById('smsInput').value.trim();
+            
+            if (!text) {
+                showError('smsError', 'Please enter SMS text');
+                return;
+            }
+            
+            resetUI('sms');
+            document.getElementById('smsLoading').style.display = 'block';
+            
+            try {
+                const response = await fetch('/analyze-sms', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text: text })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    displaySMSResult(data);
+                } else {
+                    showError('smsError', data.error || 'Analysis failed');
+                }
+            } catch (error) {
+                showError('smsError', 'Network error: ' + error.message);
+            } finally {
+                document.getElementById('smsLoading').style.display = 'none';
+            }
+        }
+        
+        function displaySMSResult(data) {
+            _lastResults['sms'] = data;
+            const isSmishing = data.is_smishing;
+
+            document.getElementById('smsVerdict').className = 'verdict ' + (isSmishing ? 'danger' : 'safe');
+            document.getElementById('smsVerdictIcon').textContent = isSmishing ? '⚠️' : '✅';
+            document.getElementById('smsVerdictText').textContent = isSmishing ? 'SMISHING DETECTED' : 'LEGITIMATE SMS';
+            document.getElementById('smsVerdictScore').textContent = isSmishing ?
+                'This message appears to be a phishing attempt' : 'This message appears to be legitimate';
+
+            document.getElementById('smsScoreValue').textContent = (data.smishing_score * 100).toFixed(1) + '%';
+            document.getElementById('smsVotesValue').textContent = data.votes;
+            document.getElementById('smsConfidenceValue').textContent = (data.confidence * 100).toFixed(1) + '%';
+
+            if (data.latency_ms) {
+                document.getElementById('smsLatencyVal').textContent = `Analyzed in ${data.latency_ms}ms`;
+                document.getElementById('smsLatency').style.display = 'inline-flex';
+            }
+            document.getElementById('smsCopyBtn').style.display = 'inline-block';
+
+            const risks = data.risk_indicators || {};
+            const hasRisks = risks.has_url || risks.urgency_keywords > 0 ||
+                risks.financial_keywords > 0 || risks.brand_mention > 0 || risks.security_keywords > 0;
+
+            if (hasRisks) {
+                const riskList = document.getElementById('smsRiskList');
+                riskList.innerHTML = '';
+                if (risks.has_url) riskList.innerHTML += '<div class="risk-item">• Contains URL or link</div>';
+                if (risks.has_shortened_url) riskList.innerHTML += '<div class="risk-item">• Contains shortened URL (expanded & checked)</div>';
+                if (risks.urgency_keywords > 0) riskList.innerHTML += `<div class="risk-item">• ${risks.urgency_keywords} urgency keyword(s)</div>`;
+                if (risks.financial_keywords > 0) riskList.innerHTML += `<div class="risk-item">• ${risks.financial_keywords} financial keyword(s)</div>`;
+                if (risks.brand_mention > 0) riskList.innerHTML += `<div class="risk-item">• ${risks.brand_mention} brand mention(s)</div>`;
+                if (risks.security_keywords > 0) riskList.innerHTML += `<div class="risk-item">• ${risks.security_keywords} security keyword(s)</div>`;
+                document.getElementById('smsRiskIndicators').style.display = 'block';
+            } else {
+                document.getElementById('smsRiskIndicators').style.display = 'none';
+            }
+
+            if (data.url_analysis && data.url_analysis.length > 0) {
+                const urlList = document.getElementById('smsUrlList');
+                urlList.innerHTML = `<div class="risk-item"><strong>Total URLs: ${data.urls_found}</strong></div>
+                    <div class="risk-item"><strong>Phishing URLs: ${data.phishing_urls_detected}</strong></div><br>`;
+                data.url_analysis.forEach(url => {
+                    const status = url.is_phishing ? '⚠️ PHISHING' : '✅ SAFE';
+                    const color = url.is_phishing ? 'color:#d9534f;' : 'color:#5cb85c;';
+                    urlList.innerHTML += `<div class="risk-item" style="${color}"><strong>${status}</strong>: ${url.url} (${(url.score*100).toFixed(1)}%)</div>`;
+                });
+                document.getElementById('smsUrlAnalysis').style.display = 'block';
+            } else {
+                document.getElementById('smsUrlAnalysis').style.display = 'none';
+            }
+
+            const grid = document.getElementById('smsModelsGrid');
+            grid.innerHTML = '';
+            for (const [key, model] of Object.entries(data.individual_results)) {
+                const isModelPhishing = model.is_phishing;
+                const card = document.createElement('div');
+                card.className = 'model-card ' + (isModelPhishing ? 'vote-phishing' : 'vote-safe');
+                card.innerHTML = `
+                    <div class="model-name">${model.model}</div>
+                    <div class="model-prediction ${isModelPhishing ? 'phishing' : 'safe'}">${model.prediction}</div>
+                    <div class="model-confidence">Confidence: ${(model.confidence * 100).toFixed(1)}%</div>
+                    <span class="model-badge ${isModelPhishing ? 'badge-phishing' : 'badge-safe'}">
+                        ${isModelPhishing ? '🚨 Spam' : '✅ Ham'}
+                    </span>`;
+                grid.appendChild(card);
+            }
+            document.getElementById('smsResult').style.display = 'block';
+        }
+        
+        // Email Detection
+        document.getElementById('emailInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && e.ctrlKey) analyzeEmail();
+        });
+        
+        async function analyzeEmail() {
+            const email = document.getElementById('emailInput').value.trim();
+            
+            if (!email) {
+                showError('emailError', 'Please enter email content');
+                return;
+            }
+            
+            resetUI('email');
+            document.getElementById('emailLoading').style.display = 'block';
+            
+            try {
+                const response = await fetch('/analyze-email', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: email })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    displayEmailResult(data);
+                } else {
+                    showError('emailError', data.error || 'Analysis failed');
+                }
+            } catch (error) {
+                showError('emailError', 'Network error: ' + error.message);
+            } finally {
+                document.getElementById('emailLoading').style.display = 'none';
+            }
+        }
+        
+        function displayEmailResult(data) {
+            _lastResults['email'] = data;
+            const isPhishing = data.is_phishing;
+
+            document.getElementById('emailVerdict').className = 'verdict ' + (isPhishing ? 'danger' : 'safe');
+            document.getElementById('emailVerdictIcon').textContent = isPhishing ? '⚠️' : '✅';
+            document.getElementById('emailVerdictText').textContent = isPhishing ? 'PHISHING EMAIL' : 'LEGITIMATE EMAIL';
+            document.getElementById('emailVerdictScore').textContent = isPhishing ?
+                'This email appears to be a phishing attempt' : 'This email appears to be legitimate';
+
+            document.getElementById('emailScoreValue').textContent = (data.phishing_score * 100).toFixed(1) + '%';
+            document.getElementById('emailVotesValue').textContent = data.votes;
+            document.getElementById('emailConfidenceValue').textContent = (data.confidence * 100).toFixed(1) + '%';
+
+            if (data.latency_ms) {
+                document.getElementById('emailLatencyVal').textContent = `Analyzed in ${data.latency_ms}ms`;
+                document.getElementById('emailLatency').style.display = 'inline-flex';
+            }
+            document.getElementById('emailCopyBtn').style.display = 'inline-block';
+
+            const spoofing = data.spoofing || {};
+            const emailInfo = document.getElementById('emailInfoContent');
+            let spoofingHtml = '';
+            if (spoofing.reply_to_mismatch) spoofingHtml += `<div class="risk-item" style="color:#c53030;">⚠️ Reply-To mismatch: ${spoofing.reply_to_domain} ≠ ${spoofing.from_domain}</div>`;
+            if (spoofing.return_path_mismatch) spoofingHtml += `<div class="risk-item" style="color:#c53030;">⚠️ Return-Path mismatch detected</div>`;
+            emailInfo.innerHTML = `
+                <div class="risk-item" style="color:#1976D2;"><strong>Subject:</strong> ${data.email_data.subject || 'N/A'}</div>
+                <div class="risk-item" style="color:#1976D2;"><strong>From:</strong> ${data.email_data.sender || 'N/A'}</div>
+                <div class="risk-item" style="color:#1976D2;"><strong>Reply-To:</strong> ${data.email_data.reply_to || 'N/A'}</div>
+                <div class="risk-item" style="color:#1976D2;"><strong>Has HTML:</strong> ${data.email_data.has_html ? 'Yes' : 'No'}</div>
+                ${spoofingHtml}
+            `;
+
+            if (data.url_analysis && data.url_analysis.length > 0) {
+                const urlList = document.getElementById('emailUrlList');
+                urlList.innerHTML = `<div class="risk-item"><strong>Total URLs (raw + anchors): ${data.url_analysis.length}</strong></div><br>`;
+                data.url_analysis.forEach(url => {
+                    const status = url.is_phishing ? '⚠️ PHISHING' : '✅ SAFE';
+                    const color = url.is_phishing ? 'color:#d9534f;' : 'color:#5cb85c;';
+                    urlList.innerHTML += `<div class="risk-item" style="${color}"><strong>${status}</strong>: ${url.url} (${(url.score*100).toFixed(1)}%)</div>`;
+                });
+                document.getElementById('emailUrlAnalysis').style.display = 'block';
+            } else {
+                document.getElementById('emailUrlAnalysis').style.display = 'none';
+            }
+
+            const grid = document.getElementById('emailModelsGrid');
+            grid.innerHTML = '';
+            for (const [key, model] of Object.entries(data.individual_results)) {
+                const isModelPhishing = model.is_phishing;
+                const card = document.createElement('div');
+                card.className = 'model-card ' + (isModelPhishing ? 'vote-phishing' : 'vote-safe');
+                let extra = '';
+                if (key === 'features' && model.spoofing_score > 0.1)
+                    extra = `<div class="model-confidence">🎭 Spoofing: ${(model.spoofing_score*100).toFixed(0)}%</div>`;
+                card.innerHTML = `
+                    <div class="model-name">${model.model}</div>
+                    <div class="model-prediction ${isModelPhishing ? 'phishing' : 'safe'}">${model.prediction}</div>
+                    <div class="model-confidence">Confidence: ${(model.confidence * 100).toFixed(1)}%</div>
+                    ${extra}
+                    <span class="model-badge ${isModelPhishing ? 'badge-phishing' : 'badge-safe'}">
+                        ${isModelPhishing ? '🚨 Phishing' : '✅ Safe'}
+                    </span>`;
+                grid.appendChild(card);
+            }
+            document.getElementById('emailResult').style.display = 'block';
+        }
+        
+        // Image Detection
+        async function analyzeImage() {
+            const fileInput = document.getElementById('imageInput');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                showError('imageError', 'Please select an image file');
+                return;
+            }
+            
+            // Check file size (16MB max)
+            if (file.size > 16 * 1024 * 1024) {
+                showError('imageError', 'File too large. Maximum size is 16MB');
+                return;
+            }
+            
+            resetUI('image');
+            document.getElementById('imageLoading').style.display = 'block';
+            
+            try {
+                const formData = new FormData();
+                formData.append('image', file);
+                
+                const response = await fetch('/analyze-image', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    displayImageResult(data);
+                } else {
+                    showError('imageError', data.error || 'Analysis failed');
+                }
+            } catch (error) {
+                showError('imageError', 'Network error: ' + error.message);
+            } finally {
+                document.getElementById('imageLoading').style.display = 'none';
+            }
+        }
+        
+        function displayImageResult(data) {
+            _lastResults['image'] = data;
+            const isPhishing = data.is_phishing;
+
+            document.getElementById('imageVerdict').className = 'verdict ' + (isPhishing ? 'danger' : 'safe');
+            document.getElementById('imageVerdictIcon').textContent = isPhishing ? '⚠️' : '✅';
+            document.getElementById('imageVerdictText').textContent = isPhishing ? 'PHISHING DETECTED' : 'SAFE IMAGE';
+            document.getElementById('imageVerdictScore').textContent = isPhishing ?
+                'This image contains phishing indicators' : 'This image appears to be safe';
+
+            document.getElementById('imageScoreValue').textContent = (data.phishing_score * 100).toFixed(1) + '%';
+            document.getElementById('imageConfidenceValue').textContent = (data.confidence * 100).toFixed(1) + '%';
+            document.getElementById('imageRiskCount').textContent = data.risk_factors.length;
+
+            if (data.latency_ms) {
+                document.getElementById('imageLatencyVal').textContent = `Analyzed in ${data.latency_ms}ms`;
+                document.getElementById('imageLatency').style.display = 'inline-flex';
+            }
+            document.getElementById('imageCopyBtn').style.display = 'inline-block';
+
+            if (data.risk_factors.length > 0) {
+                const riskList = document.getElementById('imageRiskList');
+                riskList.innerHTML = data.risk_factors.map(f => `<div class="risk-item">• ${f}</div>`).join('');
+                document.getElementById('imageRiskFactors').style.display = 'block';
+            } else {
+                document.getElementById('imageRiskFactors').style.display = 'none';
+            }
+
+            const qrData = data.pipelines.qr_detection;
+            if (qrData.qr_found) {
+                let qrHtml = `<div class="risk-item" style="color:#856404;"><strong>QR Codes Found:</strong> ${qrData.qr_count}</div>`;
+                if (qrData.urls && qrData.urls.length > 0) {
+                    qrHtml += `<div class="risk-item" style="color:#856404;"><strong>Decoded URLs:</strong></div>`;
+                    qrData.urls.forEach(u => qrHtml += `<div class="risk-item" style="color:#856404; font-family:monospace;">${u}</div>`);
+                }
+                if (qrData.phishing_urls && qrData.phishing_urls.length > 0) {
+                    qrHtml += `<div class="risk-item" style="color:#c53030;">⚠️ Phishing URLs in QR: ${qrData.phishing_urls.length}</div>`;
+                }
+                if (!qrData.decode_available)
+                    qrHtml += `<div class="risk-item" style="color:#856404; font-style:italic;">Install pyzxing to enable QR URL decoding</div>`;
+                document.getElementById('imageQRContent').innerHTML = qrHtml;
+                document.getElementById('imageQRInfo').style.display = 'block';
+            } else {
+                document.getElementById('imageQRInfo').style.display = 'none';
+            }
+
+            const brandData = data.pipelines.brand_matching;
+            if (brandData.brand_detected) {
+                let brandHtml = `
+                    <div class="risk-item" style="color:#1976D2;"><strong>Top Match:</strong> ${brandData.top_brand}</div>
+                    <div class="risk-item" style="color:#1976D2;"><strong>Similarity:</strong> ${(brandData.similarity*100).toFixed(1)}%</div>
+                    <div class="risk-item" style="color:#1976D2;"><strong>Phishing Risk:</strong> ${(brandData.brand_phishing_prob*100).toFixed(1)}%</div><br>
+                    <div class="risk-item" style="color:#1976D2;"><strong>Top 5 Matches:</strong></div>
+                `;
+                brandData.top5_matches.forEach((m, i) => {
+                    brandHtml += `<div class="risk-item" style="color:#1976D2;">${i+1}. ${m.brand} — ${(m.similarity*100).toFixed(1)}%</div>`;
+                });
+                document.getElementById('imageBrandContent').innerHTML = brandHtml;
+                document.getElementById('imageBrandInfo').style.display = 'block';
+            } else {
+                document.getElementById('imageBrandInfo').style.display = 'none';
+            }
+
+            const textData = data.pipelines.text_extraction;
+            if (textData.text_found) {
+                let smsInfo = '';
+                if (textData.sms_verdict !== null && textData.sms_verdict !== undefined)
+                    smsInfo = `<div class="risk-item" style="color:#7b1fa2;"><strong>SMS Shield verdict:</strong> ${textData.sms_verdict ? '🚨 Phishing text' : '✅ Safe text'} (${(textData.text_phishing_prob*100).toFixed(1)}%)</div>`;
+                document.getElementById('imageTextContent').innerHTML = `
+                    <div class="risk-item" style="color:#7b1fa2;"><strong>Text Length:</strong> ${textData.text_length} chars</div>
+                    ${smsInfo}
+                    <div class="risk-item" style="color:#7b1fa2;"><strong>Extracted:</strong></div>
+                    <div style="background:white;padding:10px;border-radius:5px;margin-top:5px;font-family:monospace;font-size:0.85em;color:#333;">${textData.extracted_text || 'No text'}</div>
+                `;
+                document.getElementById('imageTextInfo').style.display = 'block';
+            } else {
+                document.getElementById('imageTextInfo').style.display = 'none';
+            }
+
+            document.getElementById('imageResult').style.display = 'block';
+        }
+        
+        function resetUI(type) {
+            document.getElementById(type + 'Error').style.display = 'none';
+            document.getElementById(type + 'Result').style.display = 'none';
+            const latency = document.getElementById(type + 'Latency');
+            if (latency) latency.style.display = 'none';
+            const copyBtn = document.getElementById(type + 'CopyBtn');
+            if (copyBtn) { copyBtn.style.display = 'none'; copyBtn.classList.remove('copied'); copyBtn.textContent = '📋 Copy Result'; }
+        }
+
+        function showError(elementId, message) {
+            const errorDiv = document.getElementById(elementId);
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+        }
+
+        // Change #26: Copy result to clipboard
+        function copyResult(type) {
+            const data = _lastResults[type];
+            if (!data) return;
+
+            let text = '';
+            if (type === 'url') {
+                text = `Phishing Shield 2.0 — URL Analysis\nURL: ${data.url}\nVerdict: ${data.is_phishing ? 'PHISHING' : 'SAFE'}\nScore: ${(data.phishing_score*100).toFixed(1)}%\nConfidence: ${(data.confidence*100).toFixed(1)}%\nVotes: ${data.votes}\n`;
+            } else if (type === 'sms') {
+                text = `Phishing Shield 2.0 — SMS Analysis\nVerdict: ${data.is_smishing ? 'SMISHING' : 'LEGITIMATE'}\nScore: ${(data.smishing_score*100).toFixed(1)}%\nConfidence: ${(data.confidence*100).toFixed(1)}%\nVotes: ${data.votes}\n`;
+            } else if (type === 'email') {
+                text = `Phishing Shield 2.0 — Email Analysis\nSubject: ${data.email_data.subject}\nFrom: ${data.email_data.sender}\nVerdict: ${data.is_phishing ? 'PHISHING' : 'LEGITIMATE'}\nScore: ${(data.phishing_score*100).toFixed(1)}%\nVotes: ${data.votes}\n`;
+            } else if (type === 'image') {
+                text = `Phishing Shield 2.0 — Image Analysis\nVerdict: ${data.is_phishing ? 'PHISHING' : 'SAFE'}\nScore: ${(data.phishing_score*100).toFixed(1)}%\nRisk Factors: ${data.risk_factors.join(', ') || 'None'}\n`;
+            }
+
+            navigator.clipboard.writeText(text).then(() => {
+                const btn = document.getElementById(type + 'CopyBtn');
+                btn.classList.add('copied');
+                btn.textContent = '✅ Copied!';
+                setTimeout(() => {
+                    btn.classList.remove('copied');
+                    btn.textContent = '📋 Copy Result';
+                }, 2000);
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Phishing Shield 2.0</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <div class="header">
+      <div class="logo">
+        <span class="shield-icon">🛡️</span>
+        <div>
+          <h1>Phishing Shield</h1>
+          <p class="version">Military Grade v2.0</p>
+        </div>
+      </div>
+      <div class="status-indicator" id="statusIndicator">
+        <span class="status-dot"></span>
+        <span class="status-text">ACTIVE</span>
+      </div>
+    </div>
+
+    <!-- Stats Dashboard -->
+    <div class="stats-grid">
+      <div class="stat-card blocked">
+        <div class="stat-icon">🚨</div>
+        <div class="stat-info">
+          <div class="stat-value" id="blockedCount">0</div>
+          <div class="stat-label">Blocked</div>
+        </div>
+      </div>
+      <div class="stat-card checked">
+        <div class="stat-icon">🔍</div>
+        <div class="stat-info">
+          <div class="stat-value" id="checkedCount">0</div>
+          <div class="stat-label">Checked</div>
+        </div>
+      </div>
+      <div class="stat-card safe">
+        <div class="stat-icon">✅</div>
+        <div class="stat-info">
+          <div class="stat-value" id="safeCount">0</div>
+          <div class="stat-label">Safe</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="quick-actions">
+      <h3>Quick Check</h3>
+      <div class="input-group">
+        <input type="text" id="urlInput" placeholder="Enter URL to check...">
+        <button id="checkUrlBtn" class="btn-primary">Check</button>
+      </div>
+      <div class="input-group">
+        <textarea id="textInput" placeholder="Paste SMS or Email to check..." rows="3"></textarea>
+        <button id="checkTextBtn" class="btn-primary">Check</button>
+      </div>
+      <div class="input-group">
+        <button id="screenshotBtn" class="btn-secondary">📸 Scan Current Page</button>
+      </div>
+    </div>
+
+    <!-- Result Display -->
+    <div id="resultContainer" class="result-container hidden">
+      <div class="result-header">
+        <span id="resultIcon"></span>
+        <span id="resultTitle"></span>
+      </div>
+      <div class="result-details">
+        <div class="result-row">
+          <span>Confidence:</span>
+          <span id="resultConfidence"></span>
+        </div>
+        <div class="result-row">
+          <span>Threat Level:</span>
+          <span id="resultThreat"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Protection Toggle -->
+    <div class="protection-toggle">
+      <div class="toggle-info">
+        <span class="toggle-label">Real-time Protection</span>
+        <span class="toggle-desc">Block malicious links automatically</span>
+      </div>
+      <label class="switch">
+        <input type="checkbox" id="protectionToggle" checked>
+        <span class="slider"></span>
+      </label>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+      <button id="settingsBtn" class="btn-link">⚙️ Settings</button>
+      <button id="reportBtn" class="btn-link">📊 Full Report</button>
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
